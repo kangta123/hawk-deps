@@ -2,11 +2,9 @@ FROM rtfpessoa/ubuntu-jdk8
 
 ARG MAVEN_VERSION=3.6.3
 ARG USER_HOME_DIR="/root"
-ARG BASE_URL=https://mirror.bit.edu.cn/apache/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz
-
 
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
-  && curl -fsSL -o /tmp/apache-maven.tar.gz ${BASE_URL} \
+  && curl -fsSL -o /tmp/apache-maven.tar.gz https://mirrors.bfsu.edu.cn/apache/maven/maven-3/${MAVEN_VERSION}/binaries/apache-maven-${MAVEN_VERSION}-bin.tar.gz \
   && tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1 \
   && rm -f /tmp/apache-maven.tar.gz \
   && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn \
@@ -24,9 +22,15 @@ ONBUILD ARG IMAGE
 ONBUILD ARG TAG
 
 
-ADD ./tomcat/build.sh /
+ADD build.sh /
+
+ADD lib/*.jar  /
 
 ADD config.json /root/.docker/
 
-RUN chmod 755 /build.sh
+RUN chmod 755 build.sh
+
 ENTRYPOINT /build.sh
+
+
+

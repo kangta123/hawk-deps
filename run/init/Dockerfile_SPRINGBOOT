@@ -2,6 +2,6 @@ FROM alpine:latest
 
 RUN mkdir -p /data/app /data/files
 ADD app.sh /app.sh
-ONBUILD ARG JAR_FILE
-ONBUILD COPY ${JAR_FILE} /data/app/app.jar
+ONBUILD ARG OUTPUT
+ONBUILD COPY ${OUTPUT} /data/app/app.jar
 ONBUILD COPY ./docker/ /data/files/
