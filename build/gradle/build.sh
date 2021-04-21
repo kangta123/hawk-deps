@@ -14,7 +14,6 @@ package(){
 
 build_docker(){
   JAR_FILE=$1
-  pomFile=`dirname ${JAR_FILE}`
   groupId=${GROUP}
   name=`echo $JAR_FILE|rev |cut -d '/' -f1 |rev | sed 's/\-[0-9].*//'`
 
@@ -25,7 +24,7 @@ build_docker(){
 
   mkdir docker 2>/dev/null
   docker build \
-        --build-arg JAR_FILE=${JAR_FILE}  \
+        --build-arg OUTPUT=${JAR_FILE}  \
         -t ${IMAGE_NAME}:${TAG} . -f - < ${tmp}
 
   check $? "DockerBuild" ${IMAGE_NAME}
@@ -45,7 +44,8 @@ for f in `find . -regex ".*/target/[^/]*\.jar" |grep -v "sources\.jar"`
 do
   unzip -l ${f} |grep "application.*\.properties\|application.*\.yml\|bootstrap.*\.yml\|bootstrap.*\.properties"
   if [ $? -eq "0" ]; then
-    build_docker ${f}
+    echo "package file from ${f}"
+    build_docker $f
   fi
 done
 
