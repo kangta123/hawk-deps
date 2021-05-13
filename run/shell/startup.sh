@@ -6,16 +6,26 @@ if [[ ${SSH} == 1 ]]; then
 fi
 
 
+healthz="127.0.0.1:15020/healthz/ready"
 if [ -n "${HAWK_GATEWAY}" ];then
     for i in $(seq 30); do
         echo "Waiting network connection available. ${i}"
-         curl -s http://${HAWK_GATEWAY} 1>/dev/null
+        curl -i ${healthz}
+
         if [[ $? -eq "0" ]]; then
-            break
+            s=`curl -s -w "%{http_code}" -H "Connection: close" ${healthz}`
+            if [ $s -eq "200" ];then
+              echo "connected to hawk gateway"
+              break;
+            fi
         fi
         sleep 1
     done
-    curl "http://${HAWK_GATEWAY}/api/container/file?serviceName=${SERVICE_NAME}&namespace=${POD_NAMESPACE}" 2>/dev/null | sh
+
+    curl -s -o out.sh -H "Connection: close" "http://${HAWK_GATEWAY}/container/file?serviceName=${SERVICE_NAME}&namespace=${POD_NAMESPACE}"
+
+    sh out.sh
+
 else
   >&2 echo "empty env value HAWK_GATEWAY"
 fi

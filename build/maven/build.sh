@@ -23,9 +23,9 @@ do_package(){
 upload_app(){
     for f in `find . -name "pom.xml"`
     do
+        mvn help:evaluate -Dexpression=project.artifactId -f $f
         arId=`mvn help:evaluate -Dexpression=project.artifactId -f $f | sed -n '/^\[/!p' | sed -n '/^Download/!p'`
         echo "=@@subProject@$PROJECT_ID@$REMOTE_BRANCH@$arId@${f%pom.xml*}@@@"
-        echo ""
     done
 }
 
